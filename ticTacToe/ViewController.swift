@@ -10,22 +10,10 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    var brain = ticTacToeBrain()
+    
     @IBOutlet weak var ticTacToeView: UIView!
-    var isPlayerOneTurn = true
-    
     @IBOutlet weak var gameInfoLabel: UILabel!
-    
-    enum Square: String {
-        case x = "X"
-        case o = "O"
-        case blank = ""
-    }
-    
-    enum GameStatus {
-        case playerOneVictory, playerTwoVictory, catsGame, inProgress
-    }
-    
-    var board = Array(repeatElement([Square.blank, Square.blank, Square.blank], count: 3)) 
     
     @IBAction func ticTacToeButtonPressed(_ sender: UIButton) {
         let column: Int = sender.tag % 3
@@ -41,109 +29,49 @@ class ViewController: UIViewController {
             print("ERROR")
             row = -1
         }
-        guard board[row][column] == Square.blank else {
-            return
-        }
-        if isPlayerOneTurn {
-            board[row][column] = Square(rawValue: "X")!
+        switch brain.didSelectPosition(row: row, column: column) {
+        case .playerOneCompletedMove:
             sender.setTitle("X", for: .normal)
-            sender.titleLabel?.text = Square.x.rawValue
-        } else {
-            board[row][column] = Square(rawValue: "O")!
+            gameInfoLabel.text = "Player Two's Turn"
+        case .playerTwoCompletedMove:
             sender.setTitle("O", for: .normal)
-        }
-        switch statusCheck() {
-        case .inProgress:
-            isPlayerOneTurn = !isPlayerOneTurn
-            gameInfoLabel.text = (isPlayerOneTurn ? "Player One's Turn" : "Player Two's Turn")
-        case .playerOneVictory:
-            toggleButtons(.off)
-            gameInfoLabel.text = "Player One Wins!"
-        case .playerTwoVictory:
-            toggleButtons(.off)
-            gameInfoLabel.text = "Player Two Wins"
-        case .catsGame:
-            toggleButtons(.off)
-            gameInfoLabel.text = "Cat's Game!"
+            gameInfoLabel.text = "Player One's Turn"
+        case .invalidMove:
+            gameInfoLabel.text = "You can't move there!  It's still " + (gameInfoLabel.text)!
+        case .gameOver(let winner):
+            lockBoard()
+            switch winner {
+            case .playerOneVictory:
+                gameInfoLabel.text = "Player One Wins!"
+            case .playerTwoVictory:
+                gameInfoLabel.text = "Player Two Wins"
+            case .catsGame:
+                gameInfoLabel.text = "Cat's Game!"
+            }
         }
     }
+    
+    @IBAction func newGameButtonPressed(_ sender: UIButton) {
+        resetBoard()
+    }
+    func lockBoard() {
+        toggleButtons(.disabled)
+    }
+    func resetBoard() {
+        toggleButtons(.blank)
+        brain = ticTacToeBrain()
+        gameInfoLabel.text = "Player One's Turn!"
+    }
     enum NewButtonState {
-        case on, off
+        case disabled, blank
     }
     func toggleButtons(_ state: NewButtonState) {
         for view in ticTacToeView.subviews {
             if let button = view as? UIButton {
-                switch state {
-                case .on:
-                    button.isEnabled = true
-                    button.setTitle("", for: .normal)
-                    board = Array(repeatElement([Square.blank, Square.blank, Square.blank], count: 3))
-                case .off:
-                    button.isEnabled = false
-                }
+                button.isEnabled = state == .disabled
+                button.setTitle(state == .blank ? "" : button.currentTitle!, for: .normal)
             }
         }
-    }
-    
-    func horizontalVictoryCheck(board: [[Square]], player: Square) -> Bool {
-        for row in 0..<3 {
-            if board[row].reduce(true, {$0 && $1 == player}) {
-                return true
-            }
-        }
-        return false
-    }
-    
-    func diagonalVictory(board: [[Square]], player: Square) -> Bool {
-        var leftDiag = true
-        var rightDiag = true
-        for index in 0..<board.count {
-            leftDiag = leftDiag && board[index][index] == player
-            rightDiag = rightDiag && board[index][board.count - 1 - index] == player
-        }
-        return leftDiag || rightDiag
-    }
-    
-    func statusCheck() -> GameStatus {
-        //Horizontal Win
-        if horizontalVictoryCheck(board: board, player: .x) {
-            return .playerOneVictory
-        }
-        if horizontalVictoryCheck(board: board, player: .o) {
-            return .playerTwoVictory
-        }
-        //Vertical Win
-        var rotatedBoard = board
-        for row in 0..<board.count {
-            for column in 0..<board[row].count {
-                rotatedBoard[column][board[row].count - 1 - row] = board[row][column]
-            }
-        }
-        if horizontalVictoryCheck(board: rotatedBoard, player: .x) {
-            return .playerOneVictory
-        }
-        if horizontalVictoryCheck(board: rotatedBoard, player: .o) {
-            return .playerTwoVictory
-        }
-        //Diagonal Win
-        if diagonalVictory(board: rotatedBoard, player: .x) {
-            return .playerOneVictory
-        }
-        if diagonalVictory(board: rotatedBoard, player: .o) {
-            return .playerTwoVictory
-        }
-        //At least one more space
-        for row in board {
-            if row.contains(.blank) {
-                return .inProgress
-            }
-        }
-        //Board is full and there are no winners
-        return .catsGame
-    }
-    
-    @IBAction func newGameButtonPressed(_ sender: UIButton) {
-        toggleButtons(.on)
     }
 }
 
