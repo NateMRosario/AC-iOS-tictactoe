@@ -21,11 +21,15 @@ enum GameStatus {
 }
 
 class ticTacToeBrain {
+    private var board = Array(repeatElement([Square.blank, Square.blank, Square.blank], count: 3))
+    private var isPlayerOneTurn = true
+
     func didSelectPosition(row: Int, column: Int) -> GameStatus {
         guard board[row][column] == Square.blank else {
             return .invalidMove
         }
         board[row][column] = isPlayerOneTurn ? Square.x : Square.o
+        
         //Horizontal Win
         if horizontalVictoryCheck(board: board, player: .x) {
             return .gameOver(.playerOneVictory)
@@ -87,7 +91,4 @@ class ticTacToeBrain {
         case o
         case blank
     }
-    
-    private var board = Array(repeatElement([Square.blank, Square.blank, Square.blank], count: 3))
-    private var isPlayerOneTurn = true
 }

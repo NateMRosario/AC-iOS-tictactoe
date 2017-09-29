@@ -9,27 +9,14 @@
 import UIKit
 
 class ViewController: UIViewController {
-
+    
     var brain = ticTacToeBrain()
     
     @IBOutlet weak var ticTacToeView: UIView!
     @IBOutlet weak var gameInfoLabel: UILabel!
     
-    @IBAction func ticTacToeButtonPressed(_ sender: UIButton) {
-        let column: Int = sender.tag % 3
-        let row: Int
-        switch sender.tag {
-        case 0...2:
-            row = 0
-        case 3...5:
-            row = 1
-        case 6...8:
-            row = 2
-        default:
-            print("ERROR")
-            row = -1
-        }
-        switch brain.didSelectPosition(row: row, column: column) {
+    @IBAction func ticTacToeButtonPressed(_ sender: GameButton) {
+        switch brain.didSelectPosition(row: sender.row, column: sender.column) {
         case .playerOneCompletedMove:
             sender.setTitle("X", for: .normal)
             gameInfoLabel.text = "Player Two's Turn"
