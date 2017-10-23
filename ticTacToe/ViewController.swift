@@ -10,7 +10,7 @@ import UIKit
 
 class ViewController: UIViewController {
     var arrayOfButtons: [UIButton] = []
-    var brain = TicTacToeBrain()
+    var brainModel = TicTacToeBrain()
     var buttons = GameButton()
     @IBOutlet weak var scoreX: UILabel!
     @IBOutlet weak var scoreO: UILabel!
@@ -33,27 +33,27 @@ class ViewController: UIViewController {
         super.viewDidLoad()
     }
     func scoreUpdate() {
-        scoreX.text = brain.playerXScore.description
-        scoreO.text = brain.playerOScore.description
+        scoreX.text = brainModel.playerXScore.description
+        scoreO.text = brainModel.playerOScore.description
     }
     @IBAction func buttonPressed(_ sender: UIButton) {
-        if brain.board[sender.tag] == 0 && brain.game == true {
-            brain.board[sender.tag] = brain.player
-            if brain.player == 1 {
+        if brainModel.board[sender.tag] == 0 && brainModel.game == true {
+            brainModel.board[sender.tag] = brainModel.player
+            if brainModel.player == 1 {
                 sender.setBackgroundImage(#imageLiteral(resourceName: "X"), for: .normal)
-                brain.player = 2
+                brainModel.player = 2
                 `switch`.isOn = true
             } else {
                 sender.setBackgroundImage(#imageLiteral(resourceName: "O"), for: .normal)
-                brain.player = 1
+                brainModel.player = 1
                 `switch`.isOn = false
             }
         }
         win()
     }
     func win() {
-        brain.Condition()
-        let result = brain.num
+        brainModel.Condition()
+        let result = brainModel.conditionalNumber
         switch result {
         case 1:
             winnerLabel.text = "Player X has won!"
@@ -76,13 +76,12 @@ class ViewController: UIViewController {
         } 
         scoreUpdate()
     }
-    
     @IBAction func resetScore(_ sender: UIButton) {
-        brain.reset()
+        brainModel.reset()
         scoreUpdate()
     }
     @IBAction func retry(_ sender: UIButton) {
-        brain.restart()
+        brainModel.restart()
         `switch`.isOn = false
         winnerLabel.isHidden = true
         for button in arrayOfButtons {

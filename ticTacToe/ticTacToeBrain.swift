@@ -14,7 +14,7 @@
 import Foundation
 
 class TicTacToeBrain {
-    var num = 0
+    var conditionalNumber = 0
     var winningCombo = [[0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6]]
     var player = 1 //1 = X, 2 = O
     var board = [0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -28,21 +28,20 @@ class TicTacToeBrain {
                 game = false
                 if board[combo[0]] == 1 {
                     playerXScore += 1
-                    num = 1
+                    conditionalNumber = 1
                 } else {
                     playerOScore += 1
-                    num = 2
+                    conditionalNumber = 2
                 }
             }
         }
-        if num == 1 || num == 2 {
+        if conditionalNumber == 1 || conditionalNumber == 2 {
         } else if !board.contains(0) {
-                num = 3
+                conditionalNumber = 3
             }
         }
-    
     func restart() {
-        num = 0
+        conditionalNumber = 0
         player = 1
         game = true
         board = [0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -52,4 +51,5 @@ class TicTacToeBrain {
         playerOScore = 0
     }
 }
+
 
